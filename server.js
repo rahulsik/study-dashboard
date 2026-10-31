@@ -47,6 +47,17 @@ const mailer = process.env.SMTP_USER
 async function sendOtp(id, code) {
   const text = `Study Dashboard OTP: ${code}. Ye 10 minute mein expire ho jayega.`;
   if (isGmail(id)) {
+    if (process.env.MAIL_URL) {
+      // Google Apps Script ke raaste email (HTTPS, free hosting par bhi chalta hai)
+      const r = await fetch(process.env.MAIL_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ key: process.env.MAIL_KEY, to: id, subject: "Study Dashboard OTP", text }),
+      });
+      const t = (await r.text()).trim();
+      if (t !== "ok") throw new Error("Mail script ne ok nahi diya: " + t.slice(0, 80));
+      return;
+    }
     if (!mailer) return console.log(`[TEST] OTP for ${id}: ${code}`);
     await mailer.sendMail({ from: process.env.SMTP_USER, to: id, subject: "Study Dashboard OTP", text });
   } else {
