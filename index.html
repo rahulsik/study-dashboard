@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="hi-Latn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Study Dashboard</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#f2f4f8;--card:#fff;--ink:#1b2340;--mut:#5d6785;--line:#dde2ee;--a:#0f8b8d;--b:#e5a33b;--c:#d1495b;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#11162b;--card:#1a213d;--ink:#eef1fa;--mut:#9aa4c4;--line:#2b3457;--a:#3cc3c5;--b:#f0b955;--c:#ee7384;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11162b;--card:#1a213d;--ink:#eef1fa;--mut:#9aa4c4;--line:#2b3457;--a:#3cc3c5;--b:#f0b955;--c:#ee7384;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.45}
+main{max-width:980px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:clamp(28px,6vw,44px);font-weight:800;margin:8px 0 4px;letter-spacing:-.02em}
+h2{font-size:17px;font-weight:600;margin:0 0 12px}
+p.sub{color:var(--mut);margin:0 0 20px;max-width:56ch}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.kpi b{display:block;font-size:30px;font-weight:800;line-height:1.1}
+.kpi span{color:var(--mut);font-size:14px}
+.kpi.hero{background:var(--a);border-color:var(--a);color:#fff}
+.kpi.hero span{color:#e6fafa}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:720px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+form{display:grid;grid-template-columns:1fr 1.3fr auto;gap:10px;align-items:end}
+@media(max-width:720px){form{grid-template-columns:1fr 1fr}form button{grid-column:1/-1}}
+label{display:block;font-size:13px;color:var(--mut);margin-bottom:4px}
+input,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+button{font:inherit;font-weight:600;border:0;border-radius:10px;padding:11px 18px;background:var(--ink);color:var(--bg);cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.bars{display:flex;align-items:flex-end;gap:8px;height:170px;border-bottom:1px solid var(--line)}
+.col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;min-width:0}
+.col i{display:block;width:100%;max-width:44px;background:var(--a);border-radius:6px 6px 0 0;min-height:2px}
+.col small{font-size:11px;color:var(--mut);margin-bottom:3px}
+.days{display:flex;gap:8px;margin-top:6px}
+.days span{flex:1;text-align:center;font-size:12px;color:var(--mut)}
+.row{display:grid;grid-template-columns:90px 1fr 56px;gap:8px;align-items:center;margin:9px 0;font-size:14px}
+.track{height:12px;background:var(--bg);border-radius:6px;overflow:hidden}
+.track i{display:block;height:100%;border-radius:6px}
+.row em{font-style:normal;text-align:right;color:var(--mut)}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--mut);font-weight:600}
+td button{background:transparent;color:var(--c);padding:4px 8px;border:1px solid var(--line)}
+.empty{color:var(--mut);padding:14px 0}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.kpi{animation:pop .5s ease backwards;animation-delay:calc(var(--n,0)*80ms)}
+.col i{transform-origin:bottom;animation:grow .7s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--n,0)*70ms + 250ms)}
+.track i{transform-origin:left;animation:fill .8s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--n,0)*90ms + 250ms)}
+tr.new{animation:pop .45s ease both}
+.chip{font-weight:500;padding:8px 14px;border-radius:999px;border:1.5px solid var(--k);background:color-mix(in srgb,var(--k) 14%,transparent);color:var(--k)}
+.chip[aria-checked="true"]{background:var(--k);border-color:var(--k);color:#fff;box-shadow:0 4px 14px color-mix(in srgb,var(--k) 45%,transparent)}
+#chips{display:flex;flex-wrap:wrap;gap:8px}
+.bg{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none}
+.bg i{position:absolute;border-radius:50%;filter:blur(70px);opacity:.4;animation:float 16s ease-in-out infinite alternate}
+.bg i:nth-child(1){width:380px;height:380px;background:#0f8b8d;top:-80px;left:-80px}
+.bg i:nth-child(2){width:340px;height:340px;background:#e5a33b;top:35%;right:-100px;animation-duration:20s;animation-delay:-5s}
+.bg i:nth-child(3){width:420px;height:420px;background:#d1495b;bottom:-120px;left:25%;animation-duration:24s;animation-delay:-9s}
+@keyframes float{from{transform:translate(0,0) scale(1)}to{transform:translate(60px,-50px) scale(1.25)}}
+main{position:relative;z-index:1}
+.card,.kpi:not(.hero){background:color-mix(in srgb,var(--card) 80%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.kpi:nth-child(2){border-top:4px solid var(--b)}
+.kpi:nth-child(3){border-top:4px solid var(--c)}
+.kpi:nth-child(4){border-top:4px solid #6c5ce7}
+.go{background:linear-gradient(135deg,var(--a),#6c5ce7);color:#fff}
+#auth{position:relative;z-index:1;min-height:80vh;display:flex;align-items:center;justify-content:center;padding:20px 16px}
+.authbox{width:100%;max-width:400px}
+body:not(.auth) #auth{display:none}
+body.auth main{display:none}
+#tabs{display:flex;gap:8px;margin-bottom:14px}
+#af{display:flex;flex-direction:column;gap:12px}
+.err{color:var(--c);min-height:1.2em;margin:0;font-size:14px}
+.note{color:var(--mut);font-size:13px;margin:14px 0 0}
+.snd{float:right;background:var(--card);color:var(--ink);border:1px solid var(--line);padding:6px 12px;border-radius:999px;font-weight:500;font-size:14px}
+.rip{position:fixed;width:90px;height:90px;border-radius:50%;border:2px solid var(--k);background:color-mix(in srgb,var(--k) 25%,transparent);animation:ripple .6s ease-out forwards;pointer-events:none;z-index:9999}
+.dot{position:fixed;width:8px;height:8px;border-radius:50%;background:var(--k);animation:burst .6s ease-out forwards;pointer-events:none;z-index:9999}
+@keyframes ripple{from{transform:translate(-50%,-50%) scale(0);opacity:.7}to{transform:translate(-50%,-50%) scale(1.3);opacity:0}}
+@keyframes burst{from{transform:translate(-50%,-50%) scale(1);opacity:1}to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.3);opacity:0}}
+@media (hover:hover){
+.kpi{transition:transform .2s,box-shadow .2s}
+.kpi:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(27,35,64,.18)}
+.col i,.track i{transition:filter .2s}
+.col:hover i,.row:hover .track i{filter:brightness(1.2)}
+.col small{transition:color .2s}
+.col:hover small{color:var(--ink);font-weight:600}
+.row{transition:transform .2s}
+.row:hover{transform:translateX(4px)}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:var(--bg)}
+button{transition:transform .15s,opacity .15s}
+button:hover{opacity:.88;transform:translateY(-1px)}
+button:active{transform:scale(.97)}
+.card{transition:border-color .2s}
+.card:hover{border-color:var(--a)}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body class="auth">
+<div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
+<section id="auth"><div class="card authbox">
+<h1>Study Dashboard</h1>
+<p class="sub">Apne account se login karo, taaki tumhara data sirf tumhara rahe.</p>
+<div id="tabs" role="radiogroup" aria-label="Login ya naya account"><button type="button" class="chip" id="tLogin" style="--k:#1c7ed6" role="radio" aria-checked="true">Login</button><button type="button" class="chip" id="tSign" style="--k:#7048e8" role="radio" aria-checked="false">Naya account</button></div>
+<form id="af">
+<div><label for="u">Gmail ya mobile number</label><input id="u" required maxlength="40" autocomplete="username" autocapitalize="none" placeholder="naam@gmail.com ya 9876543210"></div>
+<div><label for="p">Password</label><input id="p" type="password" required autocomplete="current-password"></div>
+<div id="cw" hidden><label for="p2">Password dobara</label><input id="p2" type="password" autocomplete="new-password"></div>
+<div id="ow" hidden><label for="otp">OTP (6 digit)</label><input id="otp" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div>
+<p id="err" role="alert" class="err"></p>
+<button type="submit" class="go" id="ab">Login karo</button>
+
+</form>
+<p class="note">Naye account ke liye OTP tumhare Gmail ya mobile number par aayega.</p>
+</div></section>
+<main>
+<button type="button" id="snd" class="snd" aria-pressed="true">🔊 Sound on</button>
+<button type="button" id="out" class="snd" style="margin-right:8px">Logout</button>
+<h1 id="ttl">Meri padhai ka dashboard</h1>
+<p class="sub">Har study session yahan likho. Dashboard khud dikhayega ki is hafte kitna padha, kaunsa subject aage hai, aur streak kitni lambi hai.</p>
+
+<section class="kpis" id="kpis"></section>
+
+<section class="card" style="margin-bottom:12px">
+<h2>Naya session jodo</h2>
+<form id="f">
+<div style="grid-column:1/-1"><label>Subject chuno</label><div id="chips" role="radiogroup" aria-label="Subject"></div></div>
+<div><label for="m">Minutes</label><input id="m" type="number" min="1" max="720" required value="30"></div>
+<div><label for="d">Date</label><input id="d" type="date" required></div>
+<button type="submit" class="go">Session save karo</button>
+</form>
+</section>
+
+<section class="grid">
+<div class="card"><h2>Pichhle 7 din (minutes)</h2><div class="bars" id="bars"></div><div class="days" id="days"></div></div>
+<div class="card"><h2>Subject ke hisaab se</h2><div id="subj"></div></div>
+</section>
+
+<section class="card">
+<h2>Saare sessions</h2>
+<div class="scroll" id="tbl"></div>
+</section>
+</main>
+
+<script>
+(function(){
+var KEY="study-dashboard-v1",CHIP=["#e5484d","#f08c00","#2f9e44","#1c7ed6","#7048e8","#d6336c","#0ca678","#e8590c","#3b5bdb","#ae3ec9"],COLORS=["#0f8b8d","#e5a33b","#d1495b","#6c5ce7","#3a86ff","#2a9d4a"];
+function iso(dt){var y=dt.getFullYear(),m=String(dt.getMonth()+1).padStart(2,"0"),d=String(dt.getDate()).padStart(2,"0");return y+"-"+m+"-"+d}
+function ago(n){var x=new Date();x.setDate(x.getDate()-n);return iso(x)}
+function seed(){return [
+{id:1,s:"Maths",m:60,d:ago(0)},{id:2,s:"English",m:30,d:ago(0)},{id:3,s:"Maths",m:45,d:ago(1)},
+{id:4,s:"Science",m:50,d:ago(2)},{id:5,s:"Coding",m:70,d:ago(3)},{id:6,s:"English",m:25,d:ago(4)},
+{id:7,s:"Maths",m:40,d:ago(5)},{id:8,s:"Coding",m:55,d:ago(6)}]}
+var data=null,lastId=null,subj=null;
+try{var raw=localStorage.getItem(KEY);if(raw)data=JSON.parse(raw)}catch(e){}
+if(!Array.isArray(data))data=seed();
+function save(){}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function hm(min){var h=Math.floor(min/60),r=min%60;return h?h+"h "+r+"m":r+"m"}
+function countUp(el){
+if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+var t=el.textContent,nums=t.match(/\d+/g);if(!nums)return;
+var t0=null;
+function step(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/900,1),e=1-Math.pow(1-p,3),i=0;
+el.textContent=t.replace(/\d+/g,function(){return Math.round(+nums[i++]*e)});
+if(p<1)requestAnimationFrame(step)}
+requestAnimationFrame(step)}
+function render(){
+var total=0,bySub={},byDay={};
+data.forEach(function(x){total+=x.m;bySub[x.s]=(bySub[x.s]||0)+x.m;byDay[x.d]=(byDay[x.d]||0)+x.m});
+var subs=Object.keys(bySub).sort(function(a,b){return bySub[b]-bySub[a]});
+var streak=0;for(var i=0;i<400;i++){if(byDay[ago(i)])streak++;else if(i>0)break;else break}
+var week=0;for(var j=0;j<7;j++)week+=byDay[ago(j)]||0;
+document.getElementById("kpis").innerHTML=
+'<div class="kpi hero" style="--n:0"><b>'+hm(week)+'</b><span>Is hafte ka total</span></div>'+
+'<div class="kpi" style="--n:1"><b>'+streak+' din</b><span>Lagataar streak</span></div>'+
+'<div class="kpi" style="--n:2"><b>'+data.length+'</b><span>Total sessions</span></div>'+
+'<div class="kpi" style="--n:3"><b>'+(subs[0]?esc(subs[0]):"-")+'</b><span>Sabse zyada padha</span></div>';
+Array.prototype.forEach.call(document.querySelectorAll("#kpis b"),countUp);
+var max=1,days=[];for(var k=6;k>=0;k--){var dd=ago(k);days.push(dd);max=Math.max(max,byDay[dd]||0)}
+document.getElementById("bars").innerHTML=days.map(function(dd,n){var v=byDay[dd]||0;return '<div class="col"><small>'+(v||"")+'</small><i style="--n:'+n+';background:'+COLORS[n%COLORS.length]+';height:'+Math.round(v/max*130)+'px"></i></div>'}).join("");
+var names=["Ravi","Som","Mangal","Budh","Guru","Shukra","Shani"];
+document.getElementById("days").innerHTML=days.map(function(dd){var p=dd.split("-");return '<span>'+names[new Date(+p[0],+p[1]-1,+p[2]).getDay()]+'</span>'}).join("");
+document.getElementById("subj").innerHTML=subs.length?subs.map(function(s,n){return '<div class="row"><span>'+esc(s)+'</span><div class="track"><i style="width:'+Math.round(bySub[s]/bySub[subs[0]]*100)+'%;--n:'+n+';background:'+COLORS[n%COLORS.length]+'"></i></div><em>'+hm(bySub[s])+'</em></div>'}).join(""):'<div class="empty">Abhi koi session nahi hai. Upar se pehla session jodo.</div>';
+var opts=["Maths","Science","English","Hindi","Social Studies","Computer","Coding","History","Geography","GK"];
+subs.forEach(function(s){if(opts.indexOf(s)<0)opts.push(s)});
+if(!subj||opts.indexOf(subj)<0)subj=opts[0];
+document.getElementById("chips").innerHTML=opts.map(function(s,n){return '<button type="button" class="chip" style="--k:'+CHIP[n%CHIP.length]+'" role="radio" aria-checked="'+(s===subj)+'" data-s="'+esc(s)+'">'+esc(s)+'</button>'}).join("");
+
+var sorted=data.slice().sort(function(a,b){return a.d<b.d?1:a.d>b.d?-1:b.id-a.id});
+document.getElementById("tbl").innerHTML=sorted.length?'<table><thead><tr><th>Date</th><th>Subject</th><th>Time</th><th></th></tr></thead><tbody>'+sorted.map(function(x){return '<tr'+(x.id===lastId?' class="new"':'')+'><td>'+x.d+'</td><td>'+esc(x.s)+'</td><td>'+hm(x.m)+'</td><td><button data-id="'+x.id+'" aria-label="Delete session">Delete</button></td></tr>'}).join("")+'</tbody></table>':'<div class="empty">Koi session nahi mila.</div>';
+}
+document.getElementById("d").value=ago(0);
+var AC=null,soundOn=true,NOTES=[261.63,293.66,329.63,392,440,523.25,587.33,659.25,783.99,880],WAVES=["sine","triangle","square","sawtooth","sine"];
+function actx(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}if(AC.state==="suspended")AC.resume();return AC}
+function tone(f,type,dur,vol,delay){var c=actx();if(!c||!soundOn)return;var t=c.currentTime+(delay||0),o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur+0.05)}
+function chipSound(n){var type=WAVES[n%WAVES.length];tone(NOTES[n%NOTES.length],type,0.35,(type==="square"||type==="sawtooth")?0.16:0.5)}
+function saveSound(){tone(523.25,"triangle",0.25,0.5,0);tone(659.25,"triangle",0.25,0.5,0.1);tone(783.99,"triangle",0.4,0.5,0.2)}
+function delSound(){tone(300,"sawtooth",0.25,0.18,0);tone(180,"sawtooth",0.3,0.18,0.08)}
+document.getElementById("snd").addEventListener("click",function(){soundOn=!soundOn;this.setAttribute("aria-pressed",String(soundOn));this.textContent=soundOn?"🔊 Sound on":"🔇 Sound off";if(soundOn)tone(660,"sine",0.2,0.4)});
+var RM=window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches;
+var FX=["#e5484d","#f08c00","#2f9e44","#1c7ed6","#7048e8","#d6336c","#0ca678"];
+document.addEventListener("pointerdown",function(e){
+if(RM)return;
+var r=document.createElement("span");
+r.className="rip";r.style.cssText="left:"+e.clientX+"px;top:"+e.clientY+"px;--k:"+FX[Math.floor(Math.random()*FX.length)];
+document.body.appendChild(r);
+setTimeout(function(){r.remove()},650);
+for(var i=0;i<8;i++){var a=i/8*6.283,dist=40+Math.random()*30,d=document.createElement("span");
+d.className="dot";d.style.cssText="left:"+e.clientX+"px;top:"+e.clientY+"px;--k:"+FX[(i+3)%FX.length]+";--dx:"+Math.cos(a)*dist+"px;--dy:"+Math.sin(a)*dist+"px";
+document.body.appendChild(d);
+(function(n){setTimeout(function(){n.remove()},650)})(d)}
+});
+document.getElementById("chips").addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-s]");if(!b)return;subj=b.getAttribute("data-s");chipSound(Array.prototype.indexOf.call(this.children,b));Array.prototype.forEach.call(this.children,function(c){c.setAttribute("aria-checked",String(c===b))})});
+document.getElementById("f").addEventListener("submit",function(e){
+e.preventDefault();
+var s=subj,m=parseInt(document.getElementById("m").value,10),d=document.getElementById("d").value;
+if(!s||!m||!d)return;
+var id=data.reduce(function(a,x){return Math.max(a,x.id)},0)+1;
+api("POST","/api/sessions",{s:s,m:m,d:d}).then(function(r){data.push(r);lastId=r.id;render();saveSound()}).catch(function(x){alert(x.message)});
+
+});
+document.getElementById("tbl").addEventListener("click",function(e){
+var id=e.target.getAttribute&&e.target.getAttribute("data-id");
+if(!id)return;
+api("DELETE","/api/sessions/"+id).then(function(){data=data.filter(function(x){return String(x.id)!==id});lastId=null;render();delSound()}).catch(function(x){alert(x.message)});
+});
+render();
+var mode="login",pending=false;
+function api(method,url,body){return fetch(url,{method:method,headers:{"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined,credentials:"same-origin"}).then(function(r){return r.json().catch(function(){return{}}).then(function(j){if(!r.ok)throw new Error(j.error||"Kuch gadbad hui. Dobara try karo.");return j})})}
+function normId(v){v=String(v).trim().toLowerCase();var d=v.replace(/[\s\-]/g,"");if(/^[6-9]\d{9}$/.test(d))return d;var m=d.match(/^(?:\+91|91)([6-9]\d{9})$/);return m?m[1]:v}
+function validId(u){return /^[a-z0-9._%+\-]+@gmail\.com$/.test(u)||/^[6-9]\d{9}$/.test(u)}
+function showName(u){if(/^\d{10}$/.test(u))return "***"+u.slice(-4);return u.indexOf("@")>0?u.split("@")[0]:u}
+function enter(u){
+document.getElementById("ttl").textContent="Namaste, "+showName(u);
+return api("GET","/api/sessions").then(function(rows){data=rows;lastId=null;subj=null;document.body.classList.remove("auth");render()})
+}
+function setMode(m){mode=m;pending=false;var s=m==="signup",er=document.getElementById("err");document.getElementById("cw").hidden=!s;document.getElementById("ow").hidden=true;document.getElementById("p2").required=s;document.getElementById("otp").required=false;document.getElementById("ab").textContent=s?"OTP bhejo":"Login karo";document.getElementById("tLogin").setAttribute("aria-checked",String(!s));document.getElementById("tSign").setAttribute("aria-checked",String(s));document.getElementById("p").setAttribute("autocomplete",s?"new-password":"current-password");er.textContent="";er.style.color=""}
+document.getElementById("tLogin").addEventListener("click",function(){setMode("login");chipSound(3)});
+document.getElementById("tSign").addEventListener("click",function(){setMode("signup");chipSound(5)});
+document.getElementById("af").addEventListener("submit",function(e){
+e.preventDefault();
+var u=normId(document.getElementById("u").value),p=document.getElementById("p").value,err=document.getElementById("err"),btn=document.getElementById("ab");
+err.style.color="";err.textContent="";
+function fail(x){err.textContent=x.message;btn.disabled=false;delSound()}
+if(!u){err.textContent="Gmail ya mobile number likho.";return}
+if(mode==="login"){
+btn.disabled=true;
+api("POST","/api/login",{id:u,password:p}).then(function(){saveSound();return enter(u)}).then(function(){btn.disabled=false}).catch(fail);
+return}
+if(!pending){
+if(!validId(u)){err.textContent="Naya account sirf Gmail (naam@gmail.com) ya 10 digit mobile number se banega.";return}
+if(p.length<6){err.textContent="Password kam se kam 6 akshar ka rakho.";return}
+if(p!==document.getElementById("p2").value){err.textContent="Dono password same nahi hain.";return}
+btn.disabled=true;
+api("POST","/api/signup/start",{id:u,password:p}).then(function(){pending=true;btn.disabled=false;document.getElementById("ow").hidden=false;document.getElementById("otp").required=true;document.getElementById("otp").focus();btn.textContent="OTP verify karo";err.style.color="var(--a)";err.textContent="OTP bhej diya hai. 10 minute ke andar daalo."}).catch(fail);
+return}
+btn.disabled=true;
+api("POST","/api/signup/verify",{id:u,otp:document.getElementById("otp").value.trim()}).then(function(){saveSound();return enter(u)}).then(function(){btn.disabled=false}).catch(fail);
+});
+document.getElementById("out").addEventListener("click",function(){api("POST","/api/logout").catch(function(){}).then(function(){document.body.classList.add("auth");document.getElementById("af").reset();setMode("login");window.scrollTo(0,0)})});
+setMode("login");
+api("GET","/api/me").then(function(r){return enter(r.user)}).catch(function(){});
+})();
+</script>
+</body>
+</html>
